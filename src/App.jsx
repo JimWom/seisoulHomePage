@@ -1,6 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
 
+const chatApiBaseUrl = import.meta.env.VITE_CHAT_API_BASE_URL || ''
+const chatApiEndpoint = chatApiBaseUrl
+  ? `${chatApiBaseUrl.replace(/\/$/, '')}/api/v1/chat`
+  : '/api/v1/chat'
+const chatSkillCodes = (import.meta.env.VITE_CHAT_SKILL_CODES || 'official-info,lead-support')
+  .split(',')
+  .map((code) => code.trim())
+  .filter(Boolean)
+const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || ''
+const turnstileScriptUrl = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
+const aiAvatarSrc = '/images/aki.png'
+const aiDisplayName = '亜紀'
+const aiHeaderName = 'AIアシスタント 亜紀'
+
 const problems  = [
   {
     title: '問い合わせ対応に追われている',
@@ -352,36 +366,147 @@ const initialMessages = [
   },
 ]
 
-async function requestOpenClaw(message, history) {
-  try {
-    const response = await fetch('/api/openclaw/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message,
-        history: history.map(({ role, text }) => ({ role, text })),
-      }),
-    })
+function loadTurnstile() {
+  if (!turnstileSiteKey || window.turnstile) {
+    return Promise.resolve()
+  }
 
-    if (!response.ok) {
-      throw new Error('OpenClaw endpoint is not ready')
+  return new Promise((resolve, reject) => {
+    const existingScript = document.querySelector(`script[src="${turnstileScriptUrl}"]`)
+
+    if (existingScript) {
+      existingScript.addEventListener('load', resolve, { once: true })
+      existingScript.addEventListener('error', reject, { once: true })
+      return
     }
 
-    const data = await response.json()
-    return data.reply || data.message || 'OpenClaw から返信がありました。'
-  } catch {
-    await new Promise((resolve) => setTimeout(resolve, 650))
-    return '受け取りました。現在は OpenClaw バックエンド未接続のため、仮応答を返しています。次の段階で LLM やデータベース連携をここに接続できます。'
+    const script = document.createElement('script')
+    script.src = turnstileScriptUrl
+    script.async = true
+    script.defer = true
+    script.addEventListener('load', resolve, { once: true })
+    script.addEventListener('error', reject, { once: true })
+    document.head.appendChild(script)
+  })
+}
+
+async function getRobotCheckToken(widgetRef, widgetIdRef) {
+  if (!turnstileSiteKey) {
+    return ''
   }
+
+  await loadTurnstile()
+
+  return new Promise((resolve, reject) => {
+    if (!window.turnstile || !widgetRef.current) {
+      reject(new Error('Robot check is not ready'))
+      return
+    }
+
+    const handleError = () => {
+      reject(new Error('Robot check failed'))
+    }
+
+    if (widgetIdRef.current) {
+      window.turnstile.remove(widgetIdRef.current)
+      widgetIdRef.current = null
+    }
+
+    widgetIdRef.current = window.turnstile.render(widgetRef.current, {
+      sitekey: turnstileSiteKey,
+      action: 'chat',
+      size: 'invisible',
+      callback: resolve,
+      'error-callback': handleError,
+      'expired-callback': handleError,
+    })
+
+    window.turnstile.execute(widgetIdRef.current, { action: 'chat' })
+  })
+}
+
+function readChatReply(data) {
+  const lastMessage = Array.isArray(data.messages) ? data.messages[data.messages.length - 1] : null
+
+  return (
+    data.reply ||
+    data.message ||
+    data.answer ||
+    data.content ||
+    data.assistantMessage?.content ||
+    lastMessage?.text ||
+    lastMessage?.content ||
+    'OpenClaw から返信がありました。'
+  )
+}
+
+async function readApiError(response) {
+  try {
+    const data = await response.json()
+    return data.message || '送信できませんでした。時間をおいてもう一度お試しください。'
+  } catch {
+    return '送信できませんでした。時間をおいてもう一度お試しください。'
+  }
+}
+
+async function requestChat({ message, sessionId, robotToken }) {
+  const robotCheck = robotToken
+    ? {
+        token: robotToken,
+        action: 'chat',
+      }
+    : null
+
+  const response = await fetch(chatApiEndpoint, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      sessionId,
+      message,
+      robotCheck,
+      skillCodes: chatSkillCodes,
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error(await readApiError(response))
+  }
+
+  const data = await response.json()
+  return {
+    sessionId: data.sessionId || sessionId,
+    reply: readChatReply(data),
+  }
+}
+
+function AIAvatar({ className }) {
+  const [hasImageError, setHasImageError] = useState(false)
+
+  return (
+    <div className={className}>
+      {!hasImageError && (
+        <img
+          src={aiAvatarSrc}
+          alt="AI assistant"
+          onError={() => setHasImageError(true)}
+        />
+      )}
+      {hasImageError && <span>AI</span>}
+    </div>
+  )
 }
 
 function ChatPage() {
   const [messages, setMessages] = useState(initialMessages)
   const [input, setInput] = useState('')
   const [isSending, setIsSending] = useState(false)
+  const [sessionId, setSessionId] = useState(null)
   const messageEndRef = useRef(null)
+  const turnstileRef = useRef(null)
+  const turnstileWidgetIdRef = useRef(null)
 
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -407,18 +532,37 @@ function ChatPage() {
     setInput('')
     setIsSending(true)
 
-    const reply = await requestOpenClaw(trimmed, nextMessages)
+    try {
+      const robotToken = await getRobotCheckToken(turnstileRef, turnstileWidgetIdRef)
+      const result = await requestChat({
+        message: trimmed,
+        sessionId,
+        robotToken,
+      })
 
-    setMessages((current) => [
-      ...current,
-      {
-        id: Date.now() + 1,
-        role: 'agent',
-        text: reply,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      },
-    ])
-    setIsSending(false)
+      setSessionId(result.sessionId)
+      setMessages((current) => [
+        ...current,
+        {
+          id: Date.now() + 1,
+          role: 'agent',
+          text: result.reply,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ])
+    } catch (error) {
+      setMessages((current) => [
+        ...current,
+        {
+          id: Date.now() + 1,
+          role: 'agent',
+          text: error.message || '送信できませんでした。時間をおいてもう一度お試しください。',
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        },
+      ])
+    } finally {
+      setIsSending(false)
+    }
   }
 
   return (
@@ -426,9 +570,9 @@ function ChatPage() {
       <header className="chat-topbar">
         <a className="chat-back" href="#home">Home</a>
         <div className="chat-profile">
-          <div className="chat-avatar">AI</div>
+          <AIAvatar className="chat-avatar" />
           <div>
-            <h1>OpenClaw Agent</h1>
+            <h1>{aiHeaderName}</h1>
             <p>AI Agent / DX Consultation</p>
           </div>
         </div>
@@ -442,8 +586,9 @@ function ChatPage() {
           <div className="chat-messages">
             {messages.map((message) => (
               <div className={`chat-row ${message.role}`} key={message.id}>
-                {message.role === 'agent' && <div className="message-avatar">AI</div>}
+                {message.role === 'agent' && <AIAvatar className="message-avatar" />}
                 <div className="message-stack">
+                  {message.role === 'agent' && <span className="message-sender">{aiDisplayName}</span>}
                   <div className="message-bubble">{message.text}</div>
                   <span className="message-time">{message.time}</span>
                 </div>
@@ -452,8 +597,9 @@ function ChatPage() {
 
             {isSending && (
               <div className="chat-row agent">
-                <div className="message-avatar">AI</div>
+                <AIAvatar className="message-avatar" />
                 <div className="message-stack">
+                  <span className="message-sender">{aiDisplayName}</span>
                   <div className="message-bubble typing">
                     <span />
                     <span />
@@ -465,6 +611,8 @@ function ChatPage() {
 
             <div ref={messageEndRef} />
           </div>
+
+          {turnstileSiteKey && <div className="turnstile-widget" ref={turnstileRef} />}
 
           <form className="chat-composer" onSubmit={sendMessage}>
             <button className="composer-icon" type="button" aria-label="Add attachment">+</button>

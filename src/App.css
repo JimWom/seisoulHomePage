@@ -1026,7 +1026,9 @@ textarea {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #7494c0;
+  background:
+    linear-gradient(180deg, #fff8fa 0%, #fdeff4 100%),
+    #fff6f8;
 }
 
 .chat-topbar {
@@ -1039,16 +1041,18 @@ textarea {
   align-items: center;
   gap: 18px;
   padding: 12px clamp(16px, 4vw, 38px);
-  color: #fff;
-  background: #273246;
-  box-shadow: 0 8px 24px rgba(21, 34, 52, 0.18);
+  color: #1f3f2f;
+  background: rgba(255, 244, 247, 0.96);
+  border-bottom: 1px solid rgba(228, 156, 177, 0.24);
+  box-shadow: 0 6px 18px rgba(158, 91, 111, 0.08);
 }
 
 .chat-back {
   justify-self: start;
   padding: 9px 14px;
-  color: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #285c3d;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(91, 174, 119, 0.32);
   border-radius: 999px;
   font-size: 13px;
   font-weight: 800;
@@ -1074,24 +1078,33 @@ textarea {
   border-radius: 50%;
   font-size: 13px;
   font-weight: 900;
+  overflow: hidden;
+}
+
+.chat-avatar img,
+.message-avatar img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
 }
 
 .chat-profile h1 {
   margin: 0;
-  color: #fff;
+  color: #1f3f2f;
   font-size: 18px;
   line-height: 1.2;
 }
 
 .chat-profile p {
   margin: 3px 0 0;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(31, 63, 47, 0.62);
   font-size: 12px;
 }
 
 .chat-status {
   justify-self: end;
-  color: #8ef0b5;
+  color: #16a34a;
   font-size: 13px;
   font-weight: 800;
 }
@@ -1110,18 +1123,20 @@ textarea {
   display: grid;
   grid-template-rows: auto 1fr auto;
   overflow: hidden;
-  background: #8cabd8;
-  border: 1px solid rgba(255, 255, 255, 0.26);
+  background: #d7f1df;
+  border: 1px solid rgba(91, 174, 119, 0.42);
   border-radius: 8px;
-  box-shadow: 0 24px 70px rgba(20, 35, 55, 0.24);
+  box-shadow:
+    0 24px 70px rgba(48, 91, 63, 0.16),
+    0 0 0 1px rgba(255, 255, 255, 0.55) inset;
 }
 
 .chat-date {
   justify-self: center;
   margin: 18px 0 4px;
   padding: 5px 12px;
-  color: rgba(255, 255, 255, 0.92);
-  background: rgba(39, 50, 70, 0.28);
+  color: rgba(31, 63, 47, 0.72);
+  background: rgba(255, 255, 255, 0.55);
   border-radius: 999px;
   font-size: 12px;
   font-weight: 800;
@@ -1154,6 +1169,14 @@ textarea {
   align-items: flex-end;
 }
 
+.message-sender {
+  margin: 0 0 -1px 2px;
+  color: rgba(38, 96, 57, 0.78);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
 .message-bubble {
   position: relative;
   padding: 12px 15px;
@@ -1176,7 +1199,7 @@ textarea {
 }
 
 .message-time {
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(38, 96, 57, 0.68);
   font-size: 11px;
   font-weight: 700;
 }
@@ -1210,8 +1233,8 @@ textarea {
   align-items: end;
   gap: 10px;
   padding: 12px clamp(12px, 3vw, 22px);
-  background: #f7f7f7;
-  border-top: 1px solid rgba(39, 50, 70, 0.12);
+  background: #fbfdfb;
+  border-top: 1px solid rgba(91, 174, 119, 0.24);
 }
 
 .composer-icon,
@@ -1263,6 +1286,13 @@ textarea {
 .send-button:disabled {
   cursor: not-allowed;
   opacity: 0.45;
+}
+
+.turnstile-widget {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
 }
 
 @keyframes typing-bounce {
