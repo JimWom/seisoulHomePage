@@ -17,18 +17,18 @@ const aiHeaderName = 'AIアシスタント 亜紀'
 
 const problems  = [
   {
-    title: '問い合わせ対応に追われている',
+    title: '窓口に追われている',
     text: (
       <>
-        電話、メール、フォームの対応が担当者に集中し、記録や引き継ぎが後回しになっている。
+        電話、メール、対面窓口などの対応が担当者に集中し、記録や引き継ぎが後回しになっている。
       </>
     ),
   },
   {
-    title: '記録作成に時間がかかる',
+    title: '映像の確認を人に頼っている',
     text: (
       <>
-        報告書、議事録、作業記録などの作成に時間を取られ、本来の業務に集中できない。
+        カメラ映像や現場動画を人が目視で確認しており、異常や変化の発見が経験と注意力に依存している。
       </>
     ),
   },
@@ -50,40 +50,96 @@ const problems  = [
   },
 ]
 
-const services = [
+const dxInsights = [
   {
-    label: '01',
-    title: 'AI Agent 導入支援',
-    text: 'AI電話受付、Webチャット窓口、業務案内、通話・問い合わせ記録の整理などを支援します。',
+    title: 'レガシーシステムの限界',
+    text: '長年使い続けた仕組みが複雑化し、データの分断や新しい技術導入の妨げになっています。',
   },
   {
-    label: '02',
-    title: '業務システム開発',
-    text: '販売管理、在庫管理、申請受付、社内管理など、業務に合わせたWebシステムを設計・開発します。',
+    title: 'データ活用の不足',
+    text: '紙やExcelに残る情報をただ保存するだけでなく、判断や改善に使える形へ整えることが重要です。',
   },
   {
-    label: '03',
-    title: 'DX化・業務改善',
-    text: '紙、Excel、口頭確認、属人化された作業を整理し、システム化しやすい業務フローへ整えます。',
+    title: '業務変化への対応',
+    text: '市場や人手不足の変化に合わせ、現場が無理なく使えるシステムへ継続的に改善する必要があります。',
+  },
+]
+
+const aiCapabilities = [
+  {
+    label: 'Visual Intelligence',
+    title: '動画・画像認識',
+    text: 'カメラ映像から人や物の動き、異常、転倒予兆などを読み取り、現場の安全管理や見守りに活用します。',
+  },
+  {
+    label: 'Intent Recognition',
+    title: '意図認識',
+    text: '問い合わせ内容や行動履歴から、利用者が今求めていることを捉え、先回りした案内やサポートにつなげます。',
+  },
+  {
+    label: 'Dynamic Adaptation',
+    title: '動的判断',
+    text: '状況の変化をリアルタイムに把握し、配送ルート変更、優先順位付け、例外対応などを柔軟に判断します。',
+  },
+]
+
+const aiUseCases = [
+  {
+    title: '受付業務',
+    text: '問い合わせへの一次対応、記録、適切な案内をAIが支援します。',
+    image: '/images/uketsuke.png',
+    alt: '受付業務でAIが複数チャネルの問い合わせを整理するイメージ',
+  },
+  {
+    title: '建設・製造現場',
+    text: '危険行動や異常の検知により、安全管理を効率化します。',
+    image: '/images/kojo.png',
+    alt: '製造現場でAIがカメラ映像から危険行動を検知するイメージ',
+  },
+  {
+    title: '運輸・物流',
+    text: '交通状況や荷主の変更に応じたルート再計算を支援します。',
+    image: '/images/unsho.png',
+    alt: '物流現場でAIが配送ルートを再計算するイメージ',
+  },
+  {
+    title: '介護現場',
+    text: '映像や記録から、言葉になりにくい変化やニーズの把握を支援します。',
+    image: '/images/kaigo.png',
+    alt: '介護現場でAIが高齢者の変化やニーズの把握を支援するイメージ',
   },
 ]
 
 const workVideos = [
   {
-    title: '共通システムデモ１',
-    src: '/videos/共通システムサンプル1.mp4',
+    title: '映像認識・画像解析',
+    text: 'カメラ映像や画像から、人・物・動き・異常を検知します。工場、介護、物流、安全管理などに活用できます。',
+    src: '/videos/映像認識・画像解析.mp4',
   },
   {
-    title: '共通システムデモ２',
-    src: '/videos/共通システムサンプル2.mp4',
+    title: '対話AI・意図認識',
+    text: '問い合わせ内容や会話ログから、利用者が何を求めているかを理解し、案内・分類・記録を支援します。',
+    src: '/videos/対話AI・意図認識.mp4',
   },
   {
-    title: '共通システムデモ３',
-    src: '/videos/共通システムサンプル3.mp4',
+    title: '業務判断・ルール自動化',
+    text: '業務ルール、条件分岐、優先順位を整理し、申請処理、通知、振り分け、例外対応を自動化します。',
+    src: '/videos/業務判断・ルール自動化.mp4',
   },
   {
-    title: '共通システムデモ４',
-    src: '/videos/共通システムサンプル4.mp4',
+    title: '定型作業・書類入力',
+    text: '申請、更新、作業報告記録など、繰り返し発生する作業を自動記録し、スタッフの負担を軽減します。',
+    src: '/videos/定型作業・書類入力.mp4',
+  },
+  {
+    title: '業務システム開発',
+    text: '管理画面、申請受付、在庫管理、予約管理、顧客管理など、現場に合わせたWebシステムを開発します。',
+    src: '/videos/業務システム開発.mp4',
+  },
+  {
+    title: 'データ連携・可視化',
+    text: 'Excel、既存システム、問い合わせ履歴、業務データを整理し、検索・集計・ダッシュボード化します。',
+    src: '/videos/データ連携・可視化.mp4',
   },
 ]
 
@@ -99,86 +155,12 @@ const industries = [
 
 function App() {
   const [route, setRoute] = useState(() => window.location.hash || '#home')
-  const [selectedWorkIndex, setSelectedWorkIndex] = useState(0)
-  const [videoPosters, setVideoPosters] = useState({})
-  const selectedWorkVideo = workVideos[selectedWorkIndex]
 
   useEffect(() => {
     const handleHashChange = () => setRoute(window.location.hash || '#home')
     window.addEventListener('hashchange', handleHashChange)
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
-
-  useEffect(() => {
-    if (videoPosters[selectedWorkVideo.src]) {
-      return undefined
-    }
-
-    let isCancelled = false
-    const video = document.createElement('video')
-
-    const savePoster = () => {
-      if (isCancelled || !video.videoWidth || !video.videoHeight) {
-        return
-      }
-
-      const canvas = document.createElement('canvas')
-      canvas.width = video.videoWidth
-      canvas.height = video.videoHeight
-
-      const context = canvas.getContext('2d')
-      if (!context) {
-        return
-      }
-
-      context.drawImage(video, 0, 0, canvas.width, canvas.height)
-      const poster = canvas.toDataURL('image/jpeg', 0.82)
-
-      setVideoPosters((current) => {
-        if (current[selectedWorkVideo.src]) {
-          return current
-        }
-
-        return {
-          ...current,
-          [selectedWorkVideo.src]: poster,
-        }
-      })
-    }
-
-    const captureFrame = () => {
-      const targetTime = Number.isFinite(video.duration) && video.duration > 1 ? 1 : 0
-
-      if (targetTime === 0) {
-        savePoster()
-        return
-      }
-
-      const handleSeeked = () => savePoster()
-      video.addEventListener('seeked', handleSeeked, { once: true })
-
-      try {
-        video.currentTime = targetTime
-      } catch {
-        video.removeEventListener('seeked', handleSeeked)
-        savePoster()
-      }
-    }
-
-    video.muted = true
-    video.playsInline = true
-    video.preload = 'auto'
-    video.addEventListener('loadedmetadata', captureFrame, { once: true })
-    video.src = selectedWorkVideo.src
-    video.load()
-
-    return () => {
-      isCancelled = true
-      video.pause()
-      video.removeAttribute('src')
-      video.load()
-    }
-  }, [selectedWorkVideo.src, videoPosters])
 
   if (route === '#chat') {
     return <ChatPage />
@@ -198,9 +180,10 @@ function App() {
           </a>
 
           <nav className="nav">
-            <a href="#home">首页</a>
+            <a href="#home">ホーム</a>
             <a href="#problems">課題</a>
-            <a href="#services">サービス</a>
+            <a href="#dx-ai">DX・AI</a>
+            <a href="#works">保有技術</a>
             <a href="#works">実績</a>
             <a href="#company">会社紹介</a>
             <a href="#contact">お問い合わせ</a>
@@ -217,17 +200,16 @@ function App() {
               <p className="eyebrow">IT SYSTEM / DX / AI AGENT</p>
 
               <h1>
-                AI Agent 時代へ
-                <span>業務を もっとスマートに</span>
+                AI時代へ
+                <span>業務をもっとスマートに</span>
               </h1>
 
               <p className="hero-lead">
-                AI Agentは、人のように理解し、判断し、対話するアシスタントです。<br />
-                確認・記録・問い合わせ対応の負担を減らし、実務で使える仕組みを構築します。
+                <span>日本のDXとAI発展を推進します</span>
               </p>
 
               <div className="hero-actions">
-                <a className="btn primary" href="#services">サービスを見る</a>
+                <a className="btn primary" href="#works">技術を見る</a>
                 <a className="btn secondary" href="#chat">AIと相談</a>
               </div>
             </div>
@@ -247,11 +229,7 @@ function App() {
           <div className="container">
             <div className="section-head">
               <p className="section-en">BUSINESS ISSUES</p>
-              <h2>AIが対応できる業務課題</h2>
-              <p>
-                問い合わせ、記録作成、情報確認、定型作業。
-                日々の業務に残る小さな負担が、現場の時間と判断力を圧迫しています。
-              </p>
+              <h2>AIが得意の課題分野</h2>
             </div>
 
             <div className="problem-grid">
@@ -268,108 +246,113 @@ function App() {
           </div>
         </section>
 
-        <section id="services" className="section services-section">
+        <section id="dx-ai" className="section dx-ai-section">
           <div className="container">
-            <div className="section-head row">
+            <div className="section-head dx-ai-head">
               <div>
-                <p className="section-en">SERVICES</p>
-                <h2>サービス</h2>
+                <p className="section-en">DX / AI</p>
+                <h2>DXとAI化</h2>
               </div>
               <p>
-                小さく始めて、実際に使える形へ。業務整理から開発、AI活用、クラウド構築まで一貫して支援します。
+                DXは、単なるデジタル化ではありません。業務プロセス、データ、判断の流れを見直し、
+                AIを実務に組み込むことで、現場の負担を減らしながら継続的に改善できる仕組みをつくります。
               </p>
             </div>
 
-            <div className="service-grid">
-              {services.map((item) => (
-                <article className="service-card" key={item.title}>
-                  <span>{item.label}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.text}</p>
-                  <a href="#chat">AIと相談 ›</a>
-                </article>
-              ))}
+            <div className="dx-ai-grid">
+              <article className="dx-panel">
+                <div className="dx-panel-copy">
+                  <span className="panel-label">DX TRANSFORMATION</span>
+                  <h3>日本企業が直面する「2025年の崖」</h3>
+                  <p>
+                    古いシステムや属人化した業務を放置すると、保守コストや判断の遅れが積み重なります。
+                    大切なのは、今ある業務を否定することではなく、現場の知見を活かしながらデータが流れる形へ整えることです。
+                  </p>
+                </div>
+
+                <div className="insight-list">
+                  {dxInsights.map((item) => (
+                    <div className="insight-item" key={item.title}>
+                      <strong>{item.title}</strong>
+                      <span>{item.text}</span>
+                    </div>
+                  ))}
+                </div>
+              </article>
+
+              <article className="dx-panel accent">
+                <div className="dx-panel-copy">
+                  <span className="panel-label">AI IMPACT</span>
+                  <h3>生成AIから、現場で動くAIへ</h3>
+                  <p>
+                    AIは文章生成だけでなく、映像、音声、ログ、業務データを理解し、次の行動を支援する存在へ進化しています。
+                    人が定型作業から解放され、判断や創造的な業務に集中できる環境づくりが重要です。
+                  </p>
+                </div>
+
+                <div className="capability-list">
+                  {aiCapabilities.map((item) => (
+                    <div className="capability-card" key={item.title}>
+                      <span>{item.label}</span>
+                      <strong>{item.title}</strong>
+                      <p>{item.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </article>
+            </div>
+
+            <div className="usecase-panel">
+              <div>
+                <p className="section-en">USE CASE</p>
+                <h3>業界別・AI適用イメージ</h3>
+              </div>
+              <div className="usecase-card-grid">
+                {aiUseCases.map((item) => (
+                  <article className="usecase-card" key={item.title}>
+                    <img src={item.image} alt={item.alt} />
+                    <div>
+                      <strong>{item.title}</strong>
+                      <p>{item.text}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
         <section id="works" className="section works-section">
-          <div className="container works-grid">
-            <div>
-              <p className="section-en">WORKS</p>
-              <h2>実績・開発例</h2>
-              <p className="section-text">
-                実際の業務に合わせた管理画面、申請受付、在庫・棚卸、AI電話受付など、
-                業務の流れを見える化するシステム開発を行っています。
-              </p>
-
-              <div className="work-list">
-                {workVideos.map((item, index) => (
-                  <button
-                    className={`work-item ${selectedWorkIndex === index ? 'active' : ''}`}
-                    type="button"
-                    key={item.src}
-                    onClick={() => setSelectedWorkIndex(index)}
-                    aria-pressed={selectedWorkIndex === index}
-                  >
-                    <span>{String(index + 1).padStart(2, '0')}</span>
-                    <p>{item.title}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="system-preview">
-              <article className="demo-video-card">
-                <div className="demo-video-head">
-                  <span>{String(selectedWorkIndex + 1).padStart(2, '0')}</span>
-                  <h3>{selectedWorkVideo.title}</h3>
-                </div>
-                <video
-                  key={selectedWorkVideo.src}
-                  controls
-                  preload="metadata"
-                  playsInline
-                  poster={videoPosters[selectedWorkVideo.src]}
-                >
-                  <source src={selectedWorkVideo.src} type="video/mp4" />
-                  お使いのブラウザは動画再生に対応していません。
-                </video>
-              </article>
-              <p>※ 左のリストからデモ動画を選択できます。自動再生・ループ再生は行いません。</p>
-            </div>
-          </div>
-        </section>
-
-        <section className="section process-section">
           <div className="container">
             <div className="section-head">
-              <p className="section-en">PROCESS</p>
-              <h2>導入の流れ</h2>
+              <p className="section-en">WORKS</p>
+              <h2>弊社の保有技術</h2>
+              <p className="section-text">
+                映像認識、対話AI、業務判断、Webシステム開発、データ連携を組み合わせ、
+                現場で実際に使えるDX・AIシステムを構築します。
+              </p>
             </div>
 
-            <div className="process-line">
-              <div>
-                <span>01</span>
-                <h3>業務ヒアリング</h3>
-                <p>現状の業務、課題、使っている資料やシステムを確認します。</p>
-              </div>
-              <div>
-                <span>02</span>
-                <h3>設計・試作</h3>
-                <p>必要な画面、データ、AIの役割を整理し、小さく試作します。</p>
-              </div>
-              <div>
-                <span>03</span>
-                <h3>開発・連携</h3>
-                <p>Webシステム、DB、API、クラウド、AI連携を構築します。</p>
-              </div>
-              <div>
-                <span>04</span>
-                <h3>運用改善</h3>
-                <p>実際の利用状況を見ながら、機能や業務フローを改善します。</p>
-              </div>
+            <div className="technology-demo-grid">
+              {workVideos.map((item, index) => (
+                <article className="technology-demo-card" key={item.title}>
+                  <div className="technology-demo-copy">
+                    <span>{String(index + 1).padStart(2, '0')}</span>
+                    <div>
+                      <h3>{item.title}</h3>
+                      <p>{item.text}</p>
+                    </div>
+                  </div>
+                  <video controls preload="metadata" playsInline>
+                    <source src={item.src} type="video/mp4" />
+                    お使いのブラウザは動画再生に対応していません。
+                  </video>
+                </article>
+              ))}
             </div>
+            <p className="demo-note">
+              ※ 各技術領域ごとにデモ動画を配置できます。動画ファイルは対応する名称で差し替えてください。
+            </p>
           </div>
         </section>
 
