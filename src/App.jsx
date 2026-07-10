@@ -59,7 +59,7 @@ const services = [
   {
     label: '02',
     title: '業務システム開発',
-    text: '販売管理、在庫管理、申請受付、社内管理画面など、業務に合わせたWebシステムを設計・開発します。',
+    text: '販売管理、在庫管理、申請受付、社内管理など、業務に合わせたWebシステムを設計・開発します。',
   },
   {
     label: '03',
@@ -68,11 +68,23 @@ const services = [
   },
 ]
 
-const works = [
-  '業務管理システム',
-  '在庫・棚卸管理システム',
-  '申請受付管理システム',
-  'AI電話受付デモ',
+const workVideos = [
+  {
+    title: '共通システムデモ１',
+    src: '/videos/共通システムサンプル1.mp4',
+  },
+  {
+    title: '共通システムデモ２',
+    src: '/videos/共通システムサンプル2.mp4',
+  },
+  {
+    title: '共通システムデモ３',
+    src: '/videos/共通システムサンプル3.mp4',
+  },
+  {
+    title: '共通システムデモ４',
+    src: '/videos/共通システムサンプル4.mp4',
+  },
 ]
 
 const industries = [
@@ -87,12 +99,86 @@ const industries = [
 
 function App() {
   const [route, setRoute] = useState(() => window.location.hash || '#home')
+  const [selectedWorkIndex, setSelectedWorkIndex] = useState(0)
+  const [videoPosters, setVideoPosters] = useState({})
+  const selectedWorkVideo = workVideos[selectedWorkIndex]
 
   useEffect(() => {
     const handleHashChange = () => setRoute(window.location.hash || '#home')
     window.addEventListener('hashchange', handleHashChange)
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
+
+  useEffect(() => {
+    if (videoPosters[selectedWorkVideo.src]) {
+      return undefined
+    }
+
+    let isCancelled = false
+    const video = document.createElement('video')
+
+    const savePoster = () => {
+      if (isCancelled || !video.videoWidth || !video.videoHeight) {
+        return
+      }
+
+      const canvas = document.createElement('canvas')
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
+
+      const context = canvas.getContext('2d')
+      if (!context) {
+        return
+      }
+
+      context.drawImage(video, 0, 0, canvas.width, canvas.height)
+      const poster = canvas.toDataURL('image/jpeg', 0.82)
+
+      setVideoPosters((current) => {
+        if (current[selectedWorkVideo.src]) {
+          return current
+        }
+
+        return {
+          ...current,
+          [selectedWorkVideo.src]: poster,
+        }
+      })
+    }
+
+    const captureFrame = () => {
+      const targetTime = Number.isFinite(video.duration) && video.duration > 1 ? 1 : 0
+
+      if (targetTime === 0) {
+        savePoster()
+        return
+      }
+
+      const handleSeeked = () => savePoster()
+      video.addEventListener('seeked', handleSeeked, { once: true })
+
+      try {
+        video.currentTime = targetTime
+      } catch {
+        video.removeEventListener('seeked', handleSeeked)
+        savePoster()
+      }
+    }
+
+    video.muted = true
+    video.playsInline = true
+    video.preload = 'auto'
+    video.addEventListener('loadedmetadata', captureFrame, { once: true })
+    video.src = selectedWorkVideo.src
+    video.load()
+
+    return () => {
+      isCancelled = true
+      video.pause()
+      video.removeAttribute('src')
+      video.load()
+    }
+  }, [selectedWorkVideo.src, videoPosters])
 
   if (route === '#chat') {
     return <ChatPage />
@@ -218,35 +304,39 @@ function App() {
               </p>
 
               <div className="work-list">
-                {works.map((item, index) => (
-                  <div className="work-item" key={item}>
+                {workVideos.map((item, index) => (
+                  <button
+                    className={`work-item ${selectedWorkIndex === index ? 'active' : ''}`}
+                    type="button"
+                    key={item.src}
+                    onClick={() => setSelectedWorkIndex(index)}
+                    aria-pressed={selectedWorkIndex === index}
+                  >
                     <span>{String(index + 1).padStart(2, '0')}</span>
-                    <p>{item}</p>
-                  </div>
+                    <p>{item.title}</p>
+                  </button>
                 ))}
               </div>
             </div>
 
             <div className="system-preview">
-              <div className="preview-window">
-                <div className="preview-header">
-                  <span />
-                  <span />
-                  <span />
+              <article className="demo-video-card">
+                <div className="demo-video-head">
+                  <span>{String(selectedWorkIndex + 1).padStart(2, '0')}</span>
+                  <h3>{selectedWorkVideo.title}</h3>
                 </div>
-                <div className="preview-body">
-                  <div className="preview-menu" />
-                  <div className="preview-content">
-                    <div className="preview-title" />
-                    <div className="preview-table">
-                      {Array.from({ length: 20 }).map((_, index) => (
-                        <span key={index} />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <p>※ システム画面・実績画像は後ほど差し替え可能です。</p>
+                <video
+                  key={selectedWorkVideo.src}
+                  controls
+                  preload="metadata"
+                  playsInline
+                  poster={videoPosters[selectedWorkVideo.src]}
+                >
+                  <source src={selectedWorkVideo.src} type="video/mp4" />
+                  お使いのブラウザは動画再生に対応していません。
+                </video>
+              </article>
+              <p>※ 左のリストからデモ動画を選択できます。自動再生・ループ再生は行いません。</p>
             </div>
           </div>
         </section>
@@ -286,24 +376,36 @@ function App() {
         <section id="company" className="section company-section">
           <div className="container company-grid">
             <div className="company-photos">
-              <div className="photo-placeholder">OFFICE PHOTO</div>
-              <div className="photo-placeholder large">COMPANY PHOTO</div>
+              <figure className="company-photo portrait">
+                <img src="/images/shaChoShaShin.png" alt="代表取締役 王の打ち合わせ風景" />
+                <figcaption>代表取締役 王さん</figcaption>
+              </figure>
+              <figure className="company-photo large">
+                <img src="/images/building.jpg" alt="正創株式会社の所在地建物" />
+                <figcaption>会社所在地</figcaption>
+              </figure>
             </div>
 
-            <div>
+            <div className="company-intro">
               <p className="section-en">COMPANY</p>
               <h2>正創株式会社について</h2>
               <p>
-                正創株式会社は、ITシステムの企画・開発・運営を行う会社です。
-                お客様の業務を理解し、必要な仕組みを一緒に考え、実際に使えるシステムとして形にします。
+                正創株式会社は、2023年に設立された、ITシステムの企画・開発・運営を行う会社です。
+                代表取締役の王は2017年に来日して以来、日本で一貫してシステム開発に携わり、
+                現場で培った経験をもとに当社を立ち上げました。
               </p>
               <p>
-                単なる開発だけでなく、業務フローの整理、クラウド環境の構築、AI Agent の活用まで含めて、
-                現場の負担を減らす仕組みづくりを支援します。
+                日本で多くの方々に支えられ、成長の機会をいただいたことへの感謝を胸に、
+                誠実な姿勢でお客様の課題と向き合い、使う人に寄り添った仕組みづくりを大切にしています。
               </p>
               <p>
-                中小企業、自治体、介護、建築、運送など、現場ごとの課題に合わせて、
-                小さく始めて育てていけるIT導入を重視しています。
+                日本のIT・DX化には、業務モデル、人材育成、企業文化などさまざまな背景があります。
+                当社は微力ながらも、業務フローの整理、Webシステム開発、クラウド活用、AI Agent 導入を通じて、
+                日本社会のDX推進に貢献してまいります。
+              </p>
+              <p className="company-message">
+                小さく始め、着実に改善し、長く役に立つITサービスを提供すること。
+                それが、正創株式会社の変わらない姿勢です。
               </p>
             </div>
           </div>
